@@ -1,4 +1,4 @@
-package application;
+package view;
 	
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -15,6 +15,9 @@ public class Main extends Application {
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.show();
+			
+			
+			System.out.println("Lehigh Valley News App Program");
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
