@@ -35,4 +35,6 @@ public class Article {
     public void setImage(String image) { this.image = image; }
     public void setCompany(String company) { this.company = company; }
     public void setContent(String content) { this.content = content; }
+    
+    
 }

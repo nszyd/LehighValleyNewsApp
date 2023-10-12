@@ -27,4 +27,11 @@ public class Author {
     public void setLastName(String lastName) { this.lastName = lastName; }
     public void setEmail(String email) { this.email = email; }
     public void setCompany(String company) { this.company = company; }
+    
+    //Additional Methods
+    //Get full name
+    public String fullName() {
+    	return this.firstName + this.middleName + this.lastName;
+    }
+    
 }
