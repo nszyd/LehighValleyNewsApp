@@ -36,5 +36,20 @@ public class Article {
     public void setCompany(String company) { this.company = company; }
     public void setContent(String content) { this.content = content; }
     
+    //Additional Methods
     
+    //Check if article is from a certain company
+    public boolean isFromCompany(String company) {
+        return this.company.equals(company);
+    }
+    
+    //Get a snippet of content
+    public String getContentSnippet(int snippetLength) {
+        return content.substring(0, Math.min(snippetLength, content.length()));
+    }
+
+    //Check if the article is written by an author
+    public boolean isWrittenBy(String authorFullName) {
+        return author.fullName().equals(authorFullName);
+    }
 }

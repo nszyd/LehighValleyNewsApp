@@ -32,4 +32,22 @@ public class Post {
     public void setCompany(String company) { this.company = company; }
     public void setDate(String date) { this.date = date; }
     public void setUrl(String url) { this.url = url; }
+    
+    //Additional Methods
+    
+    //Get the authors full name
+    public String getAuthorFullName() {
+        return author.fullName();
+    }
+    
+    
+    //Get the title of the Article from the post
+    public String getArticleTitle() {
+        return article.getTitle();
+    }
+    
+    //Check if an article from a post is from a certain company
+    public boolean isFromCompany(String company) {
+        return this.company.equals(company);
+    }
 }

@@ -31,7 +31,25 @@ public class Author {
     //Additional Methods
     //Get full name
     public String fullName() {
-    	return this.firstName + this.middleName + this.lastName;
+        return this.firstName + " " + (this.middleName != null ? this.middleName + " " : "") + this.lastName;
+    }
+    //Check if the author works for a certain company
+    public boolean isFromCompany(String company) {
+        return this.company.equals(company);
+    }
+    //Get the initials of the Author
+    public String getInitials() {
+        String initials = "";
+        if (firstName != null && !firstName.isEmpty()) {
+            initials += firstName.charAt(0);
+        }
+        if (middleName != null && !middleName.isEmpty()) {
+            initials += middleName.charAt(0);
+        }
+        if (lastName != null && !lastName.isEmpty()) {
+            initials += lastName.charAt(0);
+        }
+        return initials.toUpperCase();
     }
     
 }
