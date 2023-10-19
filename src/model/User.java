@@ -1,6 +1,6 @@
 package model;
 
-public class User {
+public class User extends Entity {
     private Data data;
     private Post post;
 
@@ -16,4 +16,10 @@ public class User {
     // Setters
     public void setData(Data data) { this.data = data; }
     public void setPost(Post post) { this.post = post; }
+    
+    
+    @Override
+    public String description() {
+        return "This is a user with post titled " + post.getArticleTitle();
+    }
 }

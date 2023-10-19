@@ -1,6 +1,6 @@
 package model;
 
-public class Author {
+public class Author extends Entity {
     private String firstName;
     private String middleName;
     private String lastName;
@@ -27,6 +27,13 @@ public class Author {
     public void setLastName(String lastName) { this.lastName = lastName; }
     public void setEmail(String email) { this.email = email; }
     public void setCompany(String company) { this.company = company; }
+    
+    
+    
+    @Override
+    public String description() {
+        return "This is an author named " + fullName();
+    }
     
     //Additional Methods
     //Get full name

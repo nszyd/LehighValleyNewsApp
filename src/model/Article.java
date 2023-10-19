@@ -1,6 +1,6 @@
 package model;
 
-public class Article {
+public class Article implements Displayable {
     private String title;
     private Author author;
     private String date;
@@ -52,4 +52,12 @@ public class Article {
     public boolean isWrittenBy(String authorFullName) {
         return author.fullName().equals(authorFullName);
     }
+    
+    @Override
+    public void display() {
+        System.out.println("Title: " + this.title);
+        System.out.println("Content: " + getContentSnippet(100));
+        System.out.println("Date: " + this.date);
+    }
+    
 }

@@ -1,6 +1,6 @@
 package model;
 
-public class Post {
+public class Post implements Displayable {
     private Article article;
     private String image;
     private Author author;
@@ -50,4 +50,13 @@ public class Post {
     public boolean isFromCompany(String company) {
         return this.company.equals(company);
     }
+    
+    
+    @Override
+    public void display() {
+        System.out.println("Article Title: " + getArticleTitle());
+        System.out.println("Image URL: " + this.image);
+        System.out.println("Date: " + this.date);
+    }
+    
 }
