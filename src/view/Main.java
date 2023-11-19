@@ -1,11 +1,11 @@
 package view;
-
 import controller.Scraper;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -17,61 +17,114 @@ import java.util.List;
 
 public class Main extends Application {
 
-    private HBox postsBox;
+    private VBox root;
+    private HBox postsContainer;
+    private Label headerLabel;
+    private HBox filtersSearchBox;
+    private Button loadButton;
+    private HBox navigationBox;
+    private int currentPage = 0; // Track the current page
+    private int totalPages; // Total number of pages
+    private Button prevButton;
+    private Button nextButton;
 
     @Override
     public void start(Stage primaryStage) {
-        try {
-            VBox root = new VBox(10);
-            root.setAlignment(Pos.CENTER);
-            root.setPadding(new Insets(10));
+        root = new VBox(10);
+        root.getStyleClass().add("root"); // Apply root style class
+        root.setAlignment(Pos.CENTER);
+        root.setPadding(new Insets(10));
 
-            Label headerLabel = new Label("Lehigh Valley News Hub");
-            headerLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        headerLabel = new Label("Lehigh Valley News Hub");
+        headerLabel.getStyleClass().add("header-label"); // Apply header style class
 
-            HBox filtersSearchBox = new HBox(10);
-            filtersSearchBox.setAlignment(Pos.CENTER);
-            ComboBox<String> filtersComboBox = new ComboBox<>();
-            filtersComboBox.getItems().addAll("Filter 1", "Filter 2", "Filter 3");
-            TextField searchBar = new TextField();
-            searchBar.setPromptText("Search");
-            filtersSearchBox.getChildren().addAll(filtersComboBox, searchBar);
+        filtersSearchBox = new HBox(10);
+        filtersSearchBox.getStyleClass().add("filters-search-box"); // Apply filters box style class
+        filtersSearchBox.setAlignment(Pos.CENTER_LEFT);
+        ComboBox<String> filtersComboBox = new ComboBox<>();
+        filtersComboBox.getStyleClass().add("combo-box"); // Apply combo box style class
+        filtersComboBox.getItems().addAll("Filter 1", "Filter 2", "Filter 3");
+        TextField searchBar = new TextField();
+        searchBar.getStyleClass().add("text-field"); // Apply text field style class
+        searchBar.setPromptText("Search");
+        filtersSearchBox.getChildren().addAll(filtersComboBox, searchBar);
+        filtersSearchBox.setVisible(false);
 
-            postsBox = new HBox(10);
-            postsBox.setAlignment(Pos.CENTER);
+        postsContainer = new HBox(20);
+        postsContainer.getStyleClass().add("posts-container"); // Apply posts container style class
+        postsContainer.setAlignment(Pos.CENTER);
 
-            Button loadButton = new Button("Load");
-            loadButton.setOnAction(event -> loadArticles());
+        prevButton = new Button("Previous");
+        nextButton = new Button("Next");
+        prevButton.getStyleClass().add("navigation-button"); // Apply navigation button style class
+        nextButton.getStyleClass().add("navigation-button"); // Apply navigation button style class
+        prevButton.setOnAction(event -> {
+            if (currentPage > 0) {
+                currentPage--;
+                loadArticles();
+            }
+        });
 
-            root.getChildren().addAll(headerLabel, filtersSearchBox, loadButton, postsBox);
+        nextButton.setOnAction(event -> {
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                loadArticles();
+            }
+        });
 
-            Scene scene = new Scene(root, 800, 600);
-            scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-            primaryStage.setScene(scene);
-            primaryStage.setTitle("Lehigh Valley News App");
-            primaryStage.show();
+        navigationBox = new HBox(10);
+        navigationBox.getStyleClass().add("navigation-box"); // Apply navigation box style class
+        navigationBox.setAlignment(Pos.CENTER);
+        navigationBox.getChildren().addAll(prevButton, nextButton);
+        navigationBox.setVisible(false);
 
-            System.out.println("Lehigh Valley News App Program");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        loadButton = new Button("View The News");
+        loadButton.getStyleClass().add("load-button"); // Apply load button style class
+        loadButton.setOnAction(event -> {
+            loadArticles();
+            adjustLayoutAfterLoading();
+        });
+
+        root.getChildren().addAll(headerLabel, filtersSearchBox, loadButton, postsContainer, navigationBox);
+
+        Scene scene = new Scene(root, 800, 600);
+        scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Lehigh Valley News App");
+        primaryStage.setResizable(false); // Restrict window resizing
+        primaryStage.show();
+    }
+
+    private void adjustLayoutAfterLoading() {
+        headerLabel.setText("Lehigh Valley News");
+        headerLabel.setStyle("-fx-font-size: 30px;");
+
+        root.setAlignment(Pos.TOP_CENTER);
+        root.getChildren().remove(loadButton);
+
+        filtersSearchBox.setVisible(true);
+        filtersSearchBox.setPadding(new Insets(10, 0, 0, 10));
+
+        navigationBox.setVisible(true); // Show navigation box when needed
+        navigationBox.setPadding(new Insets(10, 0, 0, 10));
     }
 
     private void loadArticles() {
         Scraper scraper = new Scraper();
         try {
             List<Article> articles = scraper.scrapeLatestArticles();
-            postsBox.getChildren().clear();  // Clear existing post cards
-            
-            int count = 0;  // Initialize a count variable
-            for (Article article : articles) {
-                if (count >= 4) {  // Break the loop if 4 articles have already been added
-                    break;
-                }
+            postsContainer.getChildren().clear();
+
+            int maxArticlesToDisplay = Math.min(articles.size() - currentPage * 4, 4); // Limit to 4 articles or fewer
+            for (int i = currentPage * 4; i < currentPage * 4 + maxArticlesToDisplay; i++) {
+                Article article = articles.get(i);
                 VBox postCard = createPostCard(article);
-                postsBox.getChildren().add(postCard);
-                count++;  // Increment the count for each article added
+                postsContainer.getChildren().add(postCard);
             }
+
+            // Calculate total pages
+            totalPages = (int) Math.ceil((double) articles.size() / 4);
+
         } catch (IOException e) {
             e.printStackTrace();
             Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to load articles.");
@@ -79,32 +132,35 @@ public class Main extends Application {
         }
     }
 
-
     private VBox createPostCard(Article article) {
         VBox postCard = new VBox(10);
+        postCard.getStyleClass().add("post-card"); // Apply post card style class
         postCard.setAlignment(Pos.CENTER);
-        postCard.setStyle("-fx-border-color: black; -fx-border-width: 1px; -fx-padding: 10px;");
+        postCard.setEffect(new DropShadow()); // Add drop shadow effect
 
         Label titleLabel = new Label(article.getTitle());
-        titleLabel.setStyle("-fx-font-weight: bold;");
+        titleLabel.getStyleClass().add("post-title-label"); // Apply post title label style class
 
         ImageView imageView;
         if (article.getImage() == null || article.getImage().isEmpty()) {
-            imageView = new ImageView(new Image("file:placeholder.png"));  // Placeholder image
+            imageView = new ImageView(new Image("file:placeholder.png"));
         } else {
             imageView = new ImageView(new Image(article.getImage()));
         }
-        imageView.setFitWidth(100);
-        imageView.setFitHeight(100);
+        imageView.getStyleClass().add("post-image"); // Apply post image style class
+        imageView.setFitWidth(100); // Reduced image width
+        imageView.setFitHeight(75); // Reduced image height
 
         Label authorLabel = new Label(article.getAuthor().fullName());
         Label newsCompanyLabel = new Label(article.getCompany());
         Label dateLabel = new Label(article.getDate());
+        authorLabel.getStyleClass().add("post-details-label"); // Apply post details label style class
+        newsCompanyLabel.getStyleClass().add("post-details-label"); // Apply post details label style class
+        dateLabel.getStyleClass().add("post-details-label"); // Apply post details label style class
 
         postCard.getChildren().addAll(titleLabel, imageView, authorLabel, newsCompanyLabel, dateLabel);
         return postCard;
     }
-
 
     public static void main(String[] args) {
         launch(args);
