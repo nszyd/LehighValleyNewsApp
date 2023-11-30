@@ -1,6 +1,8 @@
 package model;
 
-public class User extends Entity {
+import java.io.Serializable;
+
+public class User extends Entity implements Serializable {
     private Data data;
     private Post post;
 

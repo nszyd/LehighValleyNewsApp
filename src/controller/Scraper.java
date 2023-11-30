@@ -26,7 +26,7 @@ public class Scraper {
             String articleUrl = articleElement.select("h2.entry-title a").attr("href");
             String imageUrl = articleElement.select("div.td-module-image img").attr("src");
             String authorName = articleElement.select("span.td-post-author-name a").text();
-            String date = articleElement.select("time.entry-date").attr("datetime");
+            String date = articleElement.select("span.updated").text();
 
             // Splitting the author's full name into first and last name assuming there's no middle name
             String[] nameParts = authorName.split(" ");

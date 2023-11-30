@@ -52,6 +52,14 @@
     -fx-font-size: 16px; /* Reduced font size */
 }
 
+.post-title-link {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px; /* Reduced font size */
+    -fx-text-fill: #333; /* Custom text color */
+    -fx-underline: false; /* Remove hyperlink underline */
+    -fx-cursor: hand; /* Cursor style on hover */
+}
+
 .post-image {
     -fx-fit-width: 100px; /* Reduced image width */
     -fx-fit-height: 75px; /* Reduced image height */
@@ -60,12 +68,12 @@
 .post-details-label {
     -fx-font-size: 12px; /* Reduced font size */
 }
+
 .navigation-box {
     -fx-spacing: 10px;
     -fx-alignment: CENTER;
 }
 
-/* Add this to your application.css file */
 .navigation-button {
     -fx-font-size: 16px;
     -fx-background-color: #4CAF50; /* Green button color */

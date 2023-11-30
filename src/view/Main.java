@@ -6,58 +6,65 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import model.Article;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main extends Application {
 
     private VBox root;
-    private HBox postsContainer;
+    private VBox postsContainer;
     private Label headerLabel;
     private HBox filtersSearchBox;
+    private ComboBox<String> sessionComboBox;
+    private List<Article> savedArticles;
+    private static final String SAVE_PATH = "savedArticles.ser";
     private Button loadButton;
     private HBox navigationBox;
-    private int currentPage = 0; // Track the current page
-    private int totalPages; // Total number of pages
+    private int currentPage = 0;
+    private int totalPages;
     private Button prevButton;
     private Button nextButton;
-
+    private boolean isSavedArticlesView = false;
     @Override
     public void start(Stage primaryStage) {
         root = new VBox(10);
-        root.getStyleClass().add("root"); // Apply root style class
+        root.getStyleClass().add("root");
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(10));
 
         headerLabel = new Label("Lehigh Valley News Hub");
-        headerLabel.getStyleClass().add("header-label"); // Apply header style class
+        headerLabel.getStyleClass().add("header-label");
 
         filtersSearchBox = new HBox(10);
-        filtersSearchBox.getStyleClass().add("filters-search-box"); // Apply filters box style class
+        filtersSearchBox.getStyleClass().add("filters-search-box");
         filtersSearchBox.setAlignment(Pos.CENTER_LEFT);
-        ComboBox<String> filtersComboBox = new ComboBox<>();
-        filtersComboBox.getStyleClass().add("combo-box"); // Apply combo box style class
-        filtersComboBox.getItems().addAll("Filter 1", "Filter 2", "Filter 3");
-        TextField searchBar = new TextField();
-        searchBar.getStyleClass().add("text-field"); // Apply text field style class
-        searchBar.setPromptText("Search");
-        filtersSearchBox.getChildren().addAll(filtersComboBox, searchBar);
+
+        savedArticles = new ArrayList<>();
+        loadSavedArticles();
+        sessionComboBox = new ComboBox<>();
+        sessionComboBox.getItems().addAll("Current Session", "Saved Articles");
+        sessionComboBox.getSelectionModel().selectFirst();
+        sessionComboBox.setOnAction(event -> {
+            isSavedArticlesView = "Saved Articles".equals(sessionComboBox.getSelectionModel().getSelectedItem());
+            handleSavedArticlesSelection();
+        });
+
+        filtersSearchBox.getChildren().add(sessionComboBox);
         filtersSearchBox.setVisible(false);
 
-        postsContainer = new HBox(20);
-        postsContainer.getStyleClass().add("posts-container"); // Apply posts container style class
+        postsContainer = new VBox(20);
+        postsContainer.getStyleClass().add("posts-container");
         postsContainer.setAlignment(Pos.CENTER);
 
         prevButton = new Button("Previous");
         nextButton = new Button("Next");
-        prevButton.getStyleClass().add("navigation-button"); // Apply navigation button style class
-        nextButton.getStyleClass().add("navigation-button"); // Apply navigation button style class
+        prevButton.getStyleClass().add("navigation-button");
+        nextButton.getStyleClass().add("navigation-button");
         prevButton.setOnAction(event -> {
             if (currentPage > 0) {
                 currentPage--;
@@ -73,13 +80,13 @@ public class Main extends Application {
         });
 
         navigationBox = new HBox(10);
-        navigationBox.getStyleClass().add("navigation-box"); // Apply navigation box style class
+        navigationBox.getStyleClass().add("navigation-box");
         navigationBox.setAlignment(Pos.CENTER);
         navigationBox.getChildren().addAll(prevButton, nextButton);
         navigationBox.setVisible(false);
 
         loadButton = new Button("View The News");
-        loadButton.getStyleClass().add("load-button"); // Apply load button style class
+        loadButton.getStyleClass().add("load-button");
         loadButton.setOnAction(event -> {
             loadArticles();
             adjustLayoutAfterLoading();
@@ -91,7 +98,7 @@ public class Main extends Application {
         scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.setTitle("Lehigh Valley News App");
-        primaryStage.setResizable(false); // Restrict window resizing
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
@@ -105,7 +112,7 @@ public class Main extends Application {
         filtersSearchBox.setVisible(true);
         filtersSearchBox.setPadding(new Insets(10, 0, 0, 10));
 
-        navigationBox.setVisible(true); // Show navigation box when needed
+        navigationBox.setVisible(true);
         navigationBox.setPadding(new Insets(10, 0, 0, 10));
     }
 
@@ -115,14 +122,13 @@ public class Main extends Application {
             List<Article> articles = scraper.scrapeLatestArticles();
             postsContainer.getChildren().clear();
 
-            int maxArticlesToDisplay = Math.min(articles.size() - currentPage * 4, 4); // Limit to 4 articles or fewer
+            int maxArticlesToDisplay = Math.min(articles.size() - currentPage * 4, 4);
             for (int i = currentPage * 4; i < currentPage * 4 + maxArticlesToDisplay; i++) {
                 Article article = articles.get(i);
                 VBox postCard = createPostCard(article);
                 postsContainer.getChildren().add(postCard);
             }
 
-            // Calculate total pages
             totalPages = (int) Math.ceil((double) articles.size() / 4);
 
         } catch (IOException e) {
@@ -132,34 +138,80 @@ public class Main extends Application {
         }
     }
 
+
     private VBox createPostCard(Article article) {
         VBox postCard = new VBox(10);
-        postCard.getStyleClass().add("post-card"); // Apply post card style class
-        postCard.setAlignment(Pos.CENTER);
-        postCard.setEffect(new DropShadow()); // Add drop shadow effect
+        postCard.getStyleClass().add("post-card");
+        postCard.setAlignment(Pos.CENTER_LEFT);
+        postCard.setEffect(new DropShadow());
 
-        Label titleLabel = new Label(article.getTitle());
-        titleLabel.getStyleClass().add("post-title-label"); // Apply post title label style class
+        HBox titleAndButton = new HBox(10);
+        titleAndButton.setAlignment(Pos.CENTER_LEFT);
 
-        ImageView imageView;
-        if (article.getImage() == null || article.getImage().isEmpty()) {
-            imageView = new ImageView(new Image("file:placeholder.png"));
-        } else {
-            imageView = new ImageView(new Image(article.getImage()));
-        }
-        imageView.getStyleClass().add("post-image"); // Apply post image style class
-        imageView.setFitWidth(100); // Reduced image width
-        imageView.setFitHeight(75); // Reduced image height
+        Button actionButton = new Button(isSavedArticlesView ? "X" : "+");
+        actionButton.setStyle("-fx-background-color: " + (isSavedArticlesView ? "red" : "green") + "; -fx-text-fill: white; -fx-background-radius: 5;");
+        actionButton.setOnAction(event -> {
+            if (isSavedArticlesView) {
+                removeArticleFromSaved(article);
+            } else {
+                saveArticle(article);
+            }
+        });
 
-        Label authorLabel = new Label(article.getAuthor().fullName());
-        Label newsCompanyLabel = new Label(article.getCompany());
-        Label dateLabel = new Label(article.getDate());
-        authorLabel.getStyleClass().add("post-details-label"); // Apply post details label style class
-        newsCompanyLabel.getStyleClass().add("post-details-label"); // Apply post details label style class
-        dateLabel.getStyleClass().add("post-details-label"); // Apply post details label style class
+        Hyperlink titleLink = new Hyperlink(article.getTitle());
+        titleLink.getStyleClass().add("post-title-link");
+        titleLink.setOnAction(event -> getHostServices().showDocument(article.getUrl()));
 
-        postCard.getChildren().addAll(titleLabel, imageView, authorLabel, newsCompanyLabel, dateLabel);
+        titleAndButton.getChildren().addAll(actionButton, titleLink);
+
+        Label detailsLabel = new Label(article.getCompany() + " | " + article.getDate());
+        detailsLabel.getStyleClass().add("post-details-label");
+
+        postCard.getChildren().addAll(titleAndButton, detailsLabel);
+
         return postCard;
+    }
+    private void saveArticle(Article article) {
+        if (!savedArticles.contains(article)) {
+            savedArticles.add(article);
+            serializeArticles();
+        }
+    }
+
+    private void removeArticleFromSaved(Article article) {
+        savedArticles.remove(article);
+        serializeArticles();
+        handleSavedArticlesSelection();
+    }
+
+    private void serializeArticles() {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(SAVE_PATH))) {
+            out.writeObject(savedArticles);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void loadSavedArticles() {
+        File file = new File(SAVE_PATH);
+        if (file.exists()) {
+            try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+                savedArticles = (List<Article>) in.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void handleSavedArticlesSelection() {
+        String selected = sessionComboBox.getSelectionModel().getSelectedItem();
+        postsContainer.getChildren().clear();
+        if ("Saved Articles".equals(selected)) {
+            savedArticles.forEach(article -> postsContainer.getChildren().add(createPostCard(article)));
+        } else {
+            loadArticles();
+        }
     }
 
     public static void main(String[] args) {

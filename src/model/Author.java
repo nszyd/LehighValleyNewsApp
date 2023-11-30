@@ -1,6 +1,8 @@
 package model;
 
-public class Author extends Entity {
+import java.io.Serializable;
+
+public class Author extends Entity   implements Serializable {
     private String firstName;
     private String middleName;
     private String lastName;

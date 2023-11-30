@@ -1,6 +1,8 @@
 package model;
 
-public class Article implements Displayable {
+import java.io.Serializable;
+
+public class Article implements Displayable, Serializable {
     private String title;
     private Author author;
     private String date;

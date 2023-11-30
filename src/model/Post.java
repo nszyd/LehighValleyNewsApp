@@ -1,6 +1,8 @@
 package model;
 
-public class Post implements Displayable {
+import java.io.Serializable;
+
+public class Post implements Displayable, Serializable {
     private Article article;
     private String image;
     private Author author;
