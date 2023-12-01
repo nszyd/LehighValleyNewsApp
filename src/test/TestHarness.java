@@ -25,7 +25,7 @@ public class TestHarness {
         int numFails = 0;
         
         Author author = new Author("John", "Doe", "john.doe@example.com", "Example Corp");
-        Article article = new Article("Test Title", author, "2023-10-12", "http://example.com", "Example Corp", "Test Content");
+        Article article = new Article("Test Title", author, "2023-10-12", "http://example.com", "Example Corp", "Test Content", false);
         Post post = new Post(article, "http://example.com/image.jpg", author, "Example Corp", "2023-10-12", "http://example.com");
         
         // Test getAuthorFullName()
@@ -57,8 +57,8 @@ public class TestHarness {
     public void testInterface() {
         List<Displayable> displayables = new ArrayList<>();
 
-        displayables.add(new Article("Test Title", new Author("John", "Doe", "john.doe@example.com", "Example Corp"), "2023-10-12", "http://example.com", "Example Corp", "Test Content"));
-        displayables.add(new Post(new Article("Test Title", new Author("John", "Doe", "john.doe@example.com", "Example Corp"), "2023-10-12", "http://example.com", "Example Corp", "Test Content"), "http://example.com/image.jpg", new Author("John", "Doe", "john.doe@example.com", "Example Corp"), "Example Corp", "2023-10-12", "http://example.com"));
+        displayables.add(new Article("Test Title", new Author("John", "Doe", "john.doe@example.com", "Example Corp"), "2023-10-12", "http://example.com", "Example Corp", "Test Content", false));
+        displayables.add(new Post(new Article("Test Title", new Author("John", "Doe", "john.doe@example.com", "Example Corp"), "2023-10-12", "http://example.com", "Example Corp", "Test Content", false), "http://example.com/image.jpg", new Author("John", "Doe", "john.doe@example.com", "Example Corp"), "Example Corp", "2023-10-12", "http://example.com"));
         
         for (Displayable displayable : displayables) {
             displayable.display();
@@ -69,7 +69,7 @@ public class TestHarness {
         List<Entity> entities = new ArrayList<>();
         
         entities.add(new Author("John", "Doe", "john.doe@example.com", "Example Corp"));
-        entities.add(new User(null, new Post(new Article("Test Title", new Author("John", "Doe", "john.doe@example.com", "Example Corp"), "2023-10-12", "http://example.com", "Example Corp", "Test Content"), "http://example.com/image.jpg", new Author("John", "Doe", "john.doe@example.com", "Example Corp"), "Example Corp", "2023-10-12", "http://example.com")));
+        entities.add(new User(null, new Post(new Article("Test Title", new Author("John", "Doe", "john.doe@example.com", "Example Corp"), "2023-10-12", "http://example.com", "Example Corp", "Test Content", false), "http://example.com/image.jpg", new Author("John", "Doe", "john.doe@example.com", "Example Corp"), "Example Corp", "2023-10-12", "http://example.com")));
         
         for (Entity entity : entities) {
             System.out.println(entity.description());

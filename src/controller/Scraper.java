@@ -31,7 +31,7 @@ public class Scraper {
             // Splitting the author's full name into first and last name assuming there's no middle name
             String[] nameParts = authorName.split(" ");
             Author author = new Author(nameParts[0], nameParts.length > 1 ? nameParts[1] : "", null, COMPANY_NAME);
-            Article article = new Article(title, author, date, articleUrl, COMPANY_NAME, null);
+            Article article = new Article(title, author, date, articleUrl, COMPANY_NAME, null, false);
             article.setImage(imageUrl);
 
             articles.add(article);

@@ -11,13 +11,16 @@ public class Article implements Displayable, Serializable {
     private String company;
     private String content;
 
-    public Article(String title, Author author, String date, String url, String company, String content) {
+    private boolean isManuallyAdded; // Flag to indicate if the article was added manually
+
+    public Article(String title, Author author, String date, String url, String company, String content, boolean isManuallyAdded) {
         this.title = title;
         this.author = author;
         this.date = date;
         this.url = url;
         this.company = company;
         this.content = content;
+        this.isManuallyAdded = isManuallyAdded;
     }
 
     // Getters
@@ -29,6 +32,8 @@ public class Article implements Displayable, Serializable {
     public String getCompany() { return company; }
     public String getContent() { return content; }
 
+    public boolean isManuallyAdded() { return isManuallyAdded; }
+
     // Setters
     public void setTitle(String title) { this.title = title; }
     public void setAuthor(Author author) { this.author = author; }
@@ -37,6 +42,8 @@ public class Article implements Displayable, Serializable {
     public void setImage(String image) { this.image = image; }
     public void setCompany(String company) { this.company = company; }
     public void setContent(String content) { this.content = content; }
+
+    public void setManuallyAdded(boolean isManuallyAdded) { this.isManuallyAdded = isManuallyAdded; }
     
     //Additional Methods
     
