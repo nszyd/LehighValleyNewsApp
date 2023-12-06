@@ -44,14 +44,14 @@ public class Article implements Displayable, Serializable {
     public void setContent(String content) { this.content = content; }
 
     public void setManuallyAdded(boolean isManuallyAdded) { this.isManuallyAdded = isManuallyAdded; }
-    
+
     //Additional Methods
-    
+
     //Check if article is from a certain company
     public boolean isFromCompany(String company) {
         return this.company.equals(company);
     }
-    
+
     //Get a snippet of content
     public String getContentSnippet(int snippetLength) {
         return content.substring(0, Math.min(snippetLength, content.length()));
@@ -61,12 +61,12 @@ public class Article implements Displayable, Serializable {
     public boolean isWrittenBy(String authorFullName) {
         return author.fullName().equals(authorFullName);
     }
-    
+
     @Override
     public void display() {
         System.out.println("Title: " + this.title);
         System.out.println("Content: " + getContentSnippet(100));
         System.out.println("Date: " + this.date);
     }
-    
+
 }

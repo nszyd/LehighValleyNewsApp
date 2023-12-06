@@ -1,4 +1,6 @@
 package view;
+
+//Handle Imports
 import controller.Scraper;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -19,8 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// Main application class for the Lehigh Valley News App
 public class Main extends Application {
-
+    // GUI components and state variables
     private VBox root;
     private VBox postsContainer;
     private Label headerLabel;
@@ -69,7 +72,7 @@ public class Main extends Application {
         });
 
         filtersSearchBox.getChildren().addAll(sessionComboBox,addButton);
-       // filtersSearchBox.getChildren().add(sessionComboBox);
+        // filtersSearchBox.getChildren().add(sessionComboBox);
         filtersSearchBox.setVisible(false);
 
         postsContainer = new VBox(20);
@@ -181,17 +184,33 @@ public class Main extends Application {
         HBox titleAndButton = new HBox(10);
         titleAndButton.setAlignment(Pos.CENTER_LEFT);
 
-        Button actionButton = new Button(isSavedArticlesView ? "X" : "+");
-        actionButton.setStyle("-fx-background-color: " + (isSavedArticlesView ? "red" : "green") + "; -fx-text-fill: white; -fx-background-radius: 5;");
-         // Modify the delete button event to refresh the saved articles view
-        actionButton.setOnAction(event -> {
-            if (isSavedArticlesView) {
+        Button actionButton = new Button();
+        boolean isArticleSaved = savedArticles.stream().anyMatch(savedArticle ->
+                savedArticle.getUrl().equals(article.getUrl()) &&
+                        savedArticle.getTitle().equals(article.getTitle()) &&
+                        savedArticle.getDate().equals(article.getDate()));
+
+        if (isSavedArticlesView) {
+            actionButton.setText("X");
+            actionButton.setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-background-radius: 5;");
+            actionButton.setOnAction(event -> {
                 removeArticleFromSaved(article);
                 loadSavedArticlesView();
+            });
+        } else {
+            if (isArticleSaved) {
+                actionButton.setText("✓");
+                actionButton.setDisable(true);
             } else {
-                saveArticle(article);
+                actionButton.setText("+");
+                actionButton.setOnAction(event -> {
+                    saveArticle(article);
+                    actionButton.setText("✓");
+                    actionButton.setDisable(true);
+                });
             }
-        });
+            actionButton.setStyle("-fx-background-color: green; -fx-text-fill: white; -fx-background-radius: 5;");
+        }
 
         Hyperlink titleLink = new Hyperlink(article.getTitle());
         titleLink.getStyleClass().add("post-title-link");
@@ -215,7 +234,13 @@ public class Main extends Application {
         return postCard;
     }
     private void saveArticle(Article article) {
-        if (!savedArticles.contains(article)) {
+        // Check if the article is already in the savedArticles list
+        boolean isAlreadySaved = savedArticles.stream().anyMatch(savedArticle ->
+                savedArticle.getUrl().equals(article.getUrl()) &&
+                        savedArticle.getTitle().equals(article.getTitle()) &&
+                        savedArticle.getDate().equals(article.getDate()));
+
+        if (!isAlreadySaved) {
             savedArticles.add(article);
             serializeArticles();
         }
