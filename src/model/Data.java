@@ -2,6 +2,7 @@ package model;
 
 import java.io.Serializable;
 
+//Represents a Data entity within the model.
 public class Data implements Serializable {
     private Post post;
 

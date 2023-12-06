@@ -2,17 +2,18 @@ package model;
 
 import java.io.Serializable;
 
+//This class encapsulates details about an article, such as title, author, and content.
 public class Article implements Displayable, Serializable {
-    private String title;
-    private Author author;
-    private String date;
-    private String url;
-    private String image;
-    private String company;
-    private String content;
-
+    private String title; // Title of the article
+    private Author author; // Author object representing the article's author
+    private String date; // Publication date of the article
+    private String url; // URL of the article
+    private String image; // URL of the image associated with the article
+    private String company; // Company or publisher of the article
+    private String content; // Content of the article
     private boolean isManuallyAdded; // Flag to indicate if the article was added manually
 
+// Constructor to initialize an Article with its attributes.
     public Article(String title, Author author, String date, String url, String company, String content, boolean isManuallyAdded) {
         this.title = title;
         this.author = author;
@@ -23,7 +24,7 @@ public class Article implements Displayable, Serializable {
         this.isManuallyAdded = isManuallyAdded;
     }
 
-    // Getters
+    // Getter methods for retrieving article attributes
     public String getTitle() { return title; }
     public Author getAuthor() { return author; }
     public String getDate() { return date; }
@@ -34,7 +35,7 @@ public class Article implements Displayable, Serializable {
 
     public boolean isManuallyAdded() { return isManuallyAdded; }
 
-    // Setters
+    // Setter methods for updating article attributes
     public void setTitle(String title) { this.title = title; }
     public void setAuthor(Author author) { this.author = author; }
     public void setDate(String date) { this.date = date; }
@@ -45,7 +46,7 @@ public class Article implements Displayable, Serializable {
 
     public void setManuallyAdded(boolean isManuallyAdded) { this.isManuallyAdded = isManuallyAdded; }
 
-    //Additional Methods
+    // Additional methods for specific functionalities
 
     //Check if article is from a certain company
     public boolean isFromCompany(String company) {

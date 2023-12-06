@@ -38,8 +38,11 @@ public class Main extends Application {
     private Button prevButton;
     private Button nextButton;
     private boolean isSavedArticlesView = false;
+
+    // Entry point of the JavaFX application
     @Override
     public void start(Stage primaryStage) {
+        // Initialize and configure GUI components
         root = new VBox(10);
         root.getStyleClass().add("root");
         root.setAlignment(Pos.CENTER);
@@ -64,7 +67,7 @@ public class Main extends Application {
         addButton.setVisible(false); // Initially invisible
 
 
-
+        // Event handling and interaction setup
         sessionComboBox.setOnAction(event -> {
             isSavedArticlesView = "Saved Articles".equals(sessionComboBox.getSelectionModel().getSelectedItem());
             addButton.setVisible(isSavedArticlesView); // Only show add button in "Saved Articles" view
@@ -72,7 +75,6 @@ public class Main extends Application {
         });
 
         filtersSearchBox.getChildren().addAll(sessionComboBox,addButton);
-        // filtersSearchBox.getChildren().add(sessionComboBox);
         filtersSearchBox.setVisible(false);
 
         postsContainer = new VBox(20);
@@ -118,6 +120,8 @@ public class Main extends Application {
             adjustLayoutAfterLoading();
         });
 
+
+        // Finalize and display the main window
         root.getChildren().addAll(headerLabel, filtersSearchBox, loadButton, postsContainer, navigationBox);
         navigationBox.setVisible(false);
         Scene scene = new Scene(root, 800, 600);
@@ -128,7 +132,9 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    // Adjust layout after loading articles
     private void adjustLayoutAfterLoading() {
+        // Update header label and remove load button
         headerLabel.setText("Lehigh Valley News");
         headerLabel.setStyle("-fx-font-size: 30px;");
 
@@ -142,6 +148,7 @@ public class Main extends Application {
         navigationBox.setPadding(new Insets(10, 0, 0, 10));
     }
 
+    // Load articles from scraper or saved list
     private void loadArticles(boolean fromScraper) {
         if (fromScraper) {
             // Load articles from the scraper
@@ -174,8 +181,10 @@ public class Main extends Application {
         navigationBox.setVisible(true);
     }
 
-
+    // Create a post card for displaying an article
     private VBox createPostCard(Article article) {
+
+        // Construct a post card with article details
         VBox postCard = new VBox(10);
         postCard.getStyleClass().add("post-card");
         postCard.setAlignment(Pos.CENTER_LEFT);
@@ -184,12 +193,13 @@ public class Main extends Application {
         HBox titleAndButton = new HBox(10);
         titleAndButton.setAlignment(Pos.CENTER_LEFT);
 
+        //Determine if article is already saved
         Button actionButton = new Button();
         boolean isArticleSaved = savedArticles.stream().anyMatch(savedArticle ->
                 savedArticle.getUrl().equals(article.getUrl()) &&
                         savedArticle.getTitle().equals(article.getTitle()) &&
                         savedArticle.getDate().equals(article.getDate()));
-
+        //Dynamically set the symbol
         if (isSavedArticlesView) {
             actionButton.setText("X");
             actionButton.setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-background-radius: 5;");
@@ -211,7 +221,7 @@ public class Main extends Application {
             }
             actionButton.setStyle("-fx-background-color: green; -fx-text-fill: white; -fx-background-radius: 5;");
         }
-
+        //Make the cards hyperlinks
         Hyperlink titleLink = new Hyperlink(article.getTitle());
         titleLink.getStyleClass().add("post-title-link");
         titleLink.setOnAction(event -> getHostServices().showDocument(article.getUrl()));
@@ -220,7 +230,7 @@ public class Main extends Application {
 
         Label detailsLabel = new Label(article.getCompany() + " | " + article.getDate());
         detailsLabel.getStyleClass().add("post-details-label");
-
+    //Provide ability to edit if the card was manually added
         if (article.isManuallyAdded()) {
             Button editButton = new Button("Edit");
             editButton.setStyle("-fx-background-color: orange; -fx-text-fill: white; -fx-background-radius: 5;");
@@ -233,6 +243,7 @@ public class Main extends Application {
 
         return postCard;
     }
+    // Save an article to the savedArticles list
     private void saveArticle(Article article) {
         // Check if the article is already in the savedArticles list
         boolean isAlreadySaved = savedArticles.stream().anyMatch(savedArticle ->
@@ -245,8 +256,9 @@ public class Main extends Application {
             serializeArticles();
         }
     }
-
+    // Remove an article from the saved list
     private void removeArticleFromSaved(Article article) {
+        // Confirm before deletion and remove the article if confirmed
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to delete this article?", ButtonType.YES, ButtonType.NO);
         confirmAlert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
@@ -257,6 +269,7 @@ public class Main extends Application {
         });
     }
 
+    // Display a dialog for editing an existing article
     private void showEditArticleDialog(Article article) {
         // Create the custom dialog.
         Dialog<Article> dialog = new Dialog<>();
@@ -315,6 +328,7 @@ public class Main extends Application {
         });
     }
 
+    // Display a dialog for adding a new article
     private void showAddArticleDialog() {
         // Create the custom dialog.
         Dialog<Article> dialog = new Dialog<>();
@@ -380,6 +394,7 @@ public class Main extends Application {
         });
     }
 
+    // Serialize and save the list of articles to a file
     private void serializeArticles() {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(SAVE_PATH))) {
             out.writeObject(savedArticles);
@@ -389,6 +404,7 @@ public class Main extends Application {
     }
 
 
+    // Load saved articles from a file
     private void loadSavedArticles() {
         File file = new File(SAVE_PATH);
         if (file.exists()) {
@@ -400,6 +416,7 @@ public class Main extends Application {
         }
     }
 
+    // Load and display saved articles in the view
     private void loadSavedArticlesView() {
         // Clear previous articles
         postsContainer.getChildren().clear();
@@ -423,7 +440,9 @@ public class Main extends Application {
     }
 
 
+    // Handle selection changes in the session combo box
     private void handleSavedArticlesSelection() {
+        // Switch between "Current Session" and "Saved Articles" views
         String selected = sessionComboBox.getSelectionModel().getSelectedItem();
         isSavedArticlesView = "Saved Articles".equals(selected);
 
@@ -436,6 +455,7 @@ public class Main extends Application {
         }
     }
 
+    // Main method to launch the application
     public static void main(String[] args) {
         launch(args);
     }
